@@ -1,0 +1,242 @@
+
+/* Remove default margins and padding, set box-sizing */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body styling with gradient background and centered layout */
+body {
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+}
+
+/* Main container that holds all game elements */
+.game-container {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+    max-width: 400px;
+    width: 100%;
+}
+
+/* Header container with centered text */
+.game-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Main title styling */
+h1 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 2em;
+}
+
+/* Container for score and timer displays */
+.info-display {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 15px;
+}
+
+/* Individual display boxes for score and timer */
+.score-display,
+.timer-display {
+    background: #f0f0f0;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 1em;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Highlighted numbers in score and timer */
+.score-display span,
+.timer-display span {
+    color: #667eea;
+    font-size: 1.3em;
+}
+
+/* Grid layout for 3x3 game cells */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+    aspect-ratio: 1; /* Keeps grid square */
+}
+
+/* Base styling for each game cell */
+.cell {
+    background: #e8f5e9; /* Light green background */
+    border: 4px solid #4caf50; /* Green border */
+    border-radius: 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5em;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hover effect for cells - slight scale up */
+.cell:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Active state when cell is being clicked */
+.cell:active {
+    transform: scale(0.95);
+}
+
+/* ========================================
+   MOLE APPEARANCE
+   ======================================== */
+
+/* Styling when a mole appears in a cell */
+.cell.mole {
+    background: #fff3e0; /* Light orange background */
+    border-color: #ff9800; /* Orange border */
+}
+
+/* Display mole emoji with pop-up animation */
+.cell.mole::before {
+    content: '🦫'; /* Beaver emoji as mole */
+    animation: pop-up 0.3s ease;
+}
+
+/* Pop-up animation for mole appearance */
+@keyframes pop-up {
+    0% {
+        transform: translateY(100%) scale(0);
+    }
+    50% {
+        transform: translateY(-10%) scale(1.1);
+    }
+    100% {
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Styling when a mole is successfully hit */
+.cell.whacked {
+    background: #ffebee; /* Light red background */
+    border-color: #f44336; /* Red border */
+}
+
+/* Display explosion emoji with animation */
+.cell.whacked::before {
+    content: '💥'; /* Explosion emoji */
+    animation: explosion 0.3s ease;
+}
+
+/* Explosion animation for successful hit */
+@keyframes explosion {
+    0% {
+        transform: scale(0.5);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+/* BUTTON STYLING */
+
+/* Container for start/reset button */
+.button-container {
+    text-align: center;
+}
+
+/* Start/Reset button styling */
+.start-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 35px;
+    font-size: 1.1em;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Button hover effect - lift up */
+.start-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 20px rgba(102, 126, 234, 0.6);
+}
+
+/* Button active state */
+.start-btn:active {
+    transform: translateY(0);
+}
+
+/* Disabled button state during gameplay */
+.start-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Game over message styling (hidden by default) */
+.game-over {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 1.2em;
+    color: #f44336;
+    font-weight: bold;
+    display: none;
+}
+
+/* Show game over message with fade-in animation */
+.game-over.show {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+/* Fade-in animation for game over message */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Adjustments for smaller screens (mobile devices) */
+@media (max-width: 600px) {
+    /* Smaller title on mobile */
+    h1 {
+        font-size: 2em;
+    }
+
+    /* Smaller mole emoji on mobile */
+    .cell {
+        font-size: 2em;
+    }
+
+    /* Compact info displays on mobile */
+    .score-display,
+    .timer-display {
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+}

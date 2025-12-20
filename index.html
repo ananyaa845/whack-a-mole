@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whack-a-Mole Game</title>
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ========================================
+         HTML STRUCTURE
+         Main game container with all elements
+         ======================================== -->
+    
+    <div class="game-container">
+        <!-- Game header with title -->
+        <div class="game-header">
+            <h1>🦫 Whack-a-Mole 🦫</h1>
+            
+            <!-- Score and timer display section -->
+            <div class="info-display">
+                <!-- Score counter -->
+                <div class="score-display">
+                    Score: <span id="score">0</span>
+                </div>
+                <!-- Countdown timer -->
+                <div class="timer-display">
+                    Time: <span id="timer">30</span>s
+                </div>
+            </div>
+        </div>
+
+        <!-- 3x3 grid container for game cells -->
+        <!-- Each cell can display a mole when active -->
+        <div class="grid-container" id="grid">
+            <!-- Cell 1 - Top Left -->
+            <div class="cell" data-index="0"></div>
+            <!-- Cell 2 - Top Center -->
+            <div class="cell" data-index="1"></div>
+            <!-- Cell 3 - Top Right -->
+            <div class="cell" data-index="2"></div>
+            <!-- Cell 4 - Middle Left -->
+            <div class="cell" data-index="3"></div>
+            <!-- Cell 5 - Middle Center -->
+            <div class="cell" data-index="4"></div>
+            <!-- Cell 6 - Middle Right -->
+            <div class="cell" data-index="5"></div>
+            <!-- Cell 7 - Bottom Left -->
+            <div class="cell" data-index="6"></div>
+            <!-- Cell 8 - Bottom Center -->
+            <div class="cell" data-index="7"></div>
+            <!-- Cell 9 - Bottom Right -->
+            <div class="cell" data-index="8"></div>
+        </div>
+
+        <!-- Button container -->
+        <div class="button-container">
+            <!-- Start/Reset button for game control -->
+            <button class="start-btn" id="startBtn">Start Game</button>
+        </div>
+
+        <!-- Game over message (hidden by default) -->
+        <div class="game-over" id="gameOver"></div>
+    </div>
+
+    <!-- Link to external JavaScript file -->
+    <script src="script.js"></script>
+</body>
+</html>
