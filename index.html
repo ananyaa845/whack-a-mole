@@ -1,205 +1,196 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <style>
-      /*  Base */
-      body{
-        margin:0;min-height:100vh;
-        display:flex;justify-content:center;align-items:center;
-        background:linear-gradient(135deg,#667eea,#764ba2);
-        font-family:sans-serif;
-        .container, .modal { cursor:auto; } /* keep cursor visible in modal */
-        #weapon{pointer-events:none} /* weapon will follow cursor during game */
-      }
-      .container{
-        background:#fff;padding:25px;
-        border-radius:15px;text-align:center;
-        box-shadow:0 15px 40px rgba(0,0,0,.25)
-      }
+<head>
+  <style>
+    *{box-sizing:border-box}
+    body{
+      margin:0;min-height:100vh;
+      display:flex;justify-content:center;align-items:center;
+      background:#ffe600;font-family:system-ui,sans-serif;
+    }
 
-      /* Game Grid */
-      .grid{
-        display:grid;
-        grid-template:repeat(3,120px)/repeat(3,120px);
-        gap:18px;margin:25px auto
-      }
-      .cell{
-        background:#e8f5e9;border:3px solid #4caf50;
-        display:flex;justify-content:center;align-items:center;
-        font-size:2.8em;cursor:pointer;
-        border-radius:12px;
-        transition:.15s
-      }
-      .cell:hover{transform:scale(1.05)}
-      .cell.mole::before{content:'🦫'}
-      .cell.hit::before{content:'💥'}
-      .cell img{width:85px;height:85px;border-radius:50%}
+    /* dialogs */
+    .dialog{
+      background:#fff;border:6px solid #000;
+      padding:25px;text-align:center;
+      box-shadow:8px 8px 0 #000;display:none;
+    }
+    .dialog.active{display:block}
 
-      /* Weapon Cursor  */
-      #weapon{
-        position:fixed;pointer-events:none;
-        font-size:4em;
-        transform:translate(-50%,-50%);
-        z-index:1000
-      }
+    h1{margin:0 0 15px;text-transform:uppercase}
 
-      /* Modals */
-      .modal{
-        position:fixed;inset:0;
-        background:rgba(0,0,0,.55);
-        display:flex;justify-content:center;align-items:center
-      }
-      .box{
-        background:linear-gradient(135deg,#ffffff,#f3f4ff);
-        padding:30px;border-radius:18px;
-        text-align:center;width:280px;
-        box-shadow:0 20px 50px rgba(0,0,0,.3);
-        animation:pop .3s ease
-      }
-      .box h3{margin-top:0}
-      .box button{
-        padding:10px 18px;border:none;
-        background:#667eea;color:#fff;
-        border-radius:8px;cursor:pointer;
-        font-size:1em
-      }
-      .box button:hover{background:#5563d6}
-      .hidden{display:none}
+    /* inputs */
+    button,select,input{
+      padding:10px;margin-top:10px;
+      border:4px solid #000;font-weight:bold;
+      background:#ff5252;cursor:pointer;
+    }
+    button:hover{background:#ff1744}
 
-      @keyframes pop{
-        from{transform:scale(.8);opacity:0}
-        to{transform:scale(1);opacity:1}
-      }
-    </style>
-  </head>
+    /* game */
+    .container{
+      background:#fff;border:6px solid #000;
+      padding:20px;box-shadow:8px 8px 0 #000;
+      display:none;
+    }
+    .stats{display:flex;justify-content:space-between;font-weight:bold}
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(3,120px);
+      grid-template-rows:repeat(3,120px);
+      gap:12px;margin-top:10px;
+    }
+    .cell{
+      background:#e0f7fa;border:5px solid #000;
+      display:flex;justify-content:center;align-items:center;
+      font-size:42px;cursor:pointer;
+    }
+    .cell.mole::before{content:'🦫'}
+    .cell.hit::before{content:'💥'}
+    .cell.mole-img img{width:85%;height:85%;object-fit:cover}
+
+    /* weapon */
+    #weapon{
+      position:fixed;pointer-events:none;
+      font-size:60px;display:none;
+      transform:translate(-50%,-50%);
+    }
+
+    /* speech bubble */
+    .bubble{
+      position:absolute;background:#fff;
+      border:3px solid #000;
+      padding:6px 10px;font-weight:800;
+      box-shadow:3px 3px 0 #000;
+      animation:fade .8s forwards;
+    }
+    .bubble::after{
+      content:'';position:absolute;
+      bottom:-10px;left:15px;
+      border:6px solid transparent;
+      border-top-color:#000;
+    }
+    @keyframes fade{
+      to{opacity:0;transform:translateY(-20px)}
+    }
+  </style>
+</head>
 
 <body>
-  <!-- START MODAL -->
-  <div class="modal" id="startBox">
-    <div class="box">
-      <h3>🎯 Whack-a-Mole</h3>
-      <p>Choose your weapon</p>
-      <select id="w">
-        <option value="🩴">Slipper</option>
-        <option value="🍳">Pan</option>
-        <option value="🗞️">Rolling Pin</option>
-      </select><br><br>
-      <input type="file" id="img" accept="image/*"><br><br>
-      <button onclick="init()">Start Game</button>
-    </div>
+
+<!-- start -->
+<div class="dialog active" id="startBox">
+  <h1>WHACK!</h1>
+
+  <div><b>Choose your weapon</b></div>
+  <select id="w">
+    <option value="🩴"> Slipper</option>
+    <option value="🗞️"> Rolling Pin</option>
+    <option value="🥖"> Bat</option>
+  </select>
+
+  <div style="margin-top:12px"><b>Upload your mole (optional)</b></div>
+  <input type="file" id="img" accept="image/*">
+
+  <br>
+  <button onclick="start()">START GAME</button>
+</div>
+
+
+<!-- game -->
+<div class="container" id="game">
+  <div class="stats">
+    <div>Score: <span id="s">0</span></div>
+    <div>Time: <span id="t">30</span></div>
   </div>
+  <div class="grid" id="g"></div>
+</div>
 
-  <!-- END MODAL -->
-  <div class="modal hidden" id="endBox">
-    <div class="box">
-      <h3>🏁 Game Over</h3>
-      <p id="result"></p>
-      <button onclick="location.reload()">Play Again</button>
-    </div>
-  </div>
-  <!-- Weapon Cursor -->
-  <div id="weapon"></div>
+<!-- end -->
+<div class="dialog" id="endBox">
+  <h1>GAME OVER</h1>
+  <div>Score: <span id="fs"></span></div>
+  <div>High: <span id="hs"></span></div>
+  <button onclick="location.reload()">PLAY AGAIN</button>
+</div>
 
-  <!-- Game -->
-  <div class="container">
-    <h2>Whack-a-Mole</h2>
-    <div>Score: <span id="s">0</span> | Time: <span id="t">30</span>s</div>
-    <div class="grid" id="g"></div>
-  </div>
+<div id="weapon"></div>
 
-    <script>
-      let s=document.getElementById('s'), t=document.getElementById('t'), g=document.getElementById('g'), w=document.getElementById('w'),
-          imgInput=document.getElementById('img'), weapon=document.getElementById('weapon'),
-          startBox=document.getElementById('startBox'), endBox=document.getElementById('endBox'),
-          result=document.getElementById('result');
+<script>
+let g=document.getElementById('g'),
+s=document.getElementById('s'),
+t=document.getElementById('t'),
+weapon=document.getElementById('weapon'),
+cells=[],score=0,time=30,active=false;
+let timer,mole,hit=false,userImg=null;
+let high=localStorage.whackHigh||0;
+let words=['HAHAH!','OOPS!','TOO SLOW!','😒😒','🤪'];
 
-      let cells=[],score=0,time=30,active=false,
-          timer,mole,moleSpeed=800,
-          userImg=null,
-          high=localStorage.getItem('high')||0;
+for(let i=0;i<9;i++){
+  let d=document.createElement('div');
+  d.className='cell';
+  d.onclick=()=>{
+    if(!active) return;
+    if(d.classList.contains('mole')||d.classList.contains('mole-img')){
+      hit=true; score++; s.textContent=score;
+      d.className='cell hit'; d.innerHTML='';
+      weapon.style.transform='translate(-50%,-50%) rotate(-25deg)';
+      setTimeout(()=>weapon.style.transform='translate(-50%,-50%)',150);
+    }
+  };
+  g.append(d); cells.push(d);
+}
 
-      /* optional image upload */
-      imgInput.onchange=e=>userImg=URL.createObjectURL(e.target.files[0]);
+document.onmousemove=e=>{
+  weapon.style.left=e.clientX+'px';
+  weapon.style.top=e.clientY+'px';
+};
 
-      /* create 9 cells */
-      for(let i=0;i<9;i++){
-        let d=document.createElement('div');
-        d.className='cell';
-        d.onclick=()=>{
-          if(active && d.classList.contains('mole') || d.classList.contains('mole-img')){
-            score++; s.textContent=score;
-            d.dataset.w=w.value;
-            d.className='cell hit';
-            d.innerHTML = ''; 
-            weapon.style.transform='translate(-50%,-50%) rotate(-25deg)';
-            setTimeout(()=>{
-              d.className='cell';
-              weapon.style.transform='translate(-50%,-50%)';
-            },150);
-          }
-        };
-        g.append(d); cells.push(d);
-      }
+img.onchange=e=>{
+  let r=new FileReader();
+  r.onload=()=>userImg=r.result;
+  r.readAsDataURL(e.target.files[0]);
+};
 
-      /* start from modal */
-      function init(){
-        weapon.textContent=w.value;
-        startBox.classList.add('hidden');
-        document.onmousemove=e=>{
-          weapon.style.left=e.clientX+'px';
-          weapon.style.top=e.clientY+'px';
-        };
-        start();
-      }
+function bubble(txt){
+  let b=document.createElement('div');
+  b.className='bubble'; b.textContent=txt;
+  document.body.append(b);
+  b.style.left=Math.random()*300+200+'px';
+  b.style.top=Math.random()*200+200+'px';
+  setTimeout(()=>b.remove(),2000);
+}
 
-      /* start game */
-      function start(){
-        score = 0;
-        time = 30;
-        active = true;
-        s.textContent = 0;
-        t.textContent = time;
-                            
-        cells.forEach(c => {          // reset all cells
-          c.className = 'cell'; 
-          c.innerHTML = ''; 
-        });
-        clearInterval(timer);
-        clearInterval(mole);
-        // game timer (counts down 1 sec)
-        timer = setInterval(() => {
-          if (--time <= 0) end();
-          t.textContent = time;
-        }, 1000);
+function start(){
+  document.getElementById('startBox').classList.remove('active');
+  document.getElementById('game').style.display='block';
+  weapon.textContent=w.value; weapon.style.display='block';
+  score=0; time=30; active=true; s.textContent=0; t.textContent=30;
 
-        // mole/image spawner
-        mole = setInterval(() => {
-          // reset all cells
-          cells.forEach(c => { c.className = 'cell'; c.innerHTML = ''; });
+  timer=setInterval(()=>{
+    if(--time<=0) end();
+    t.textContent=time;
+  },1000);
 
-          // pick random cell
-          let r = cells[Math.floor(Math.random() * 9)];
+  mole=setInterval(()=>{
+    if(!hit&& Math.random()<0.6) bubble(words[Math.floor(Math.random()*5)]); //60% chance
+    hit=false;
+    cells.forEach(c=>{c.className='cell'; c.innerHTML='';});
+    let r=cells[Math.floor(Math.random()*9)];
+    if(userImg){r.classList.add('mole-img'); r.innerHTML=`<img src="${userImg}">`;}
+    else r.classList.add('mole');
+  },700);
+}
 
-          if (userImg) {
-            r.classList.add('mole-img');         // uploaded image
-            r.innerHTML = `<img src="${userImg}">`;
-          } else {
-            r.classList.add('mole');             // default mole emoji
-          }
-        }, moleSpeed);
-      }
-
-      /* end game + high score */
-      function end(){
-        active=false;
-        clearInterval(timer); clearInterval(mole);
-        if(score>high){
-          high=score;
-          localStorage.setItem('high',high);
-        }
-        result.innerHTML=`Score: ${score}<br>High Score: ${high}`;
-        endBox.classList.remove('hidden');
-      }
-    </script>
+function end(){
+  active=false; clearInterval(timer); clearInterval(mole);
+  document.getElementById('game').style.display='none';
+  document.getElementById('endBox').classList.add('active');
+  fs.textContent=score;
+  if(score>high){high=score; localStorage.whackHigh=high;}
+  hs.textContent=high;
+  weapon.style.display='none';
+}
+</script>
 </body>
 </html>
